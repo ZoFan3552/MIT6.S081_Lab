@@ -14,20 +14,23 @@ void main(){
     pipe(p_to_c);
     pipe(c_to_p);
     int pid = fork();
+    int exit_stat = 0;
     if (pid == 0)
     {
         close(p_to_c[WRITE]);
         close(c_to_p[READ]);
         if (read_error((read(p_to_c[READ],buf ,1)),sizeof(buf)))
         {
-            exit(1);
+            exit_stat = 1;
         }
-        fprintf(1,"%d : recieved ping\n",getpid());
+        fprintf(1,"%d: received ping\n",getpid());
         if (write_error((write(c_to_p[WRITE] , buf ,1)),sizeof(buf)))
         {
-            exit(1);
+            exit_stat = 1;
         }
-        exit(0);
+        close(p_to_c[READ]);
+        close(c_to_p[WRITE]);
+        exit(exit_stat);
     }else if (pid < 0)
     {
         fprintf(2 ,"fork error!");
@@ -39,16 +42,19 @@ void main(){
         close(c_to_p[WRITE]);
         if (write_error((write(p_to_c[WRITE] , buf ,1)),sizeof(buf)))
         {
-            exit(1);
+            exit_stat = 1;
         }
         wait(0);
         if (read_error((read(c_to_p[READ],buf ,1)),sizeof(buf)))
         {
-            exit(1);
+            exit_stat = 1;
         }
-        fprintf(1,"%d : recieved pong\n",getpid());
+        close(p_to_c[WRITE]);
+        close(p_to_c[WRITE]);
+        fprintf(1,"%d: received pong\n",getpid());
+        exit(exit_stat);
     }
-    exit(0);
+    exit(exit_stat);
 }
 
 int read_error(int read_buf_size ,int buf_size){
