@@ -31,6 +31,7 @@ void main(){
     }else if (pid < 0)
     {
         fprintf(2 ,"fork error!");
+        exit(1);
     }
     
     else{
