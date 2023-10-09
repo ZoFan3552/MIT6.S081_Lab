@@ -6,51 +6,45 @@
 
 int main(int argc, char *argv[])
 {
-    char line[128] = {" "};
+    char line[128];
     char *args[64];
-    char command[128];
     for (int i = 1, j = 0; i < argc; i++, j++) // 去除命令xargs
     {
         args[j] = argv[i];
     }
 
-    // int pid = fork();
-    while (strlen(line) != 0)
+    do
     {
         gets(line, sizeof(line));
         if (strlen(line) == 0)
         {
-            // exit(0);
             break;
         }
 
         char *p = line;
-        char *q = command;
-        while (*p != '\n')
+        // printf("line : %s$", line);
+        while (1)//去掉换行符
         {
-            *q = *p;
+            if (*p == '\n')
+            {
+                *p = '\0';
+                break;
+            }
             p++;
-            q++;
         }
-        // printf("命令：%s\n", command);
-        args[argc - 1] = command;
-        // for (int  i = 0; i < argc; i++)
-        // {
-        //     printf("命令：%s\n", args[i]);
-        // }
-        
+        args[argc - 1] = line;
         if (fork() == 0)
         {
+            // for (int i = 0; i < argc; i++)
+            // {
+            //     printf("arg%d : %s $", i, args[i]);
+            // }
+            // printf("\n");
             exec(args[0], args);
-            continue;
             exit(0);
         }
-        // else
-        // {
-        //     wait(0);
-        //     exit(0);
-        // }
-    }
+        wait(0);
+    } while (strlen(line) != 0);
     // 应在循环外等待所有子进程退出后父进程再退出
     wait(0);
     exit(0);
