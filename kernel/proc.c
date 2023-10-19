@@ -15,6 +15,7 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
+
 extern void forkret(void);
 static void freeproc(struct proc *p);
 
@@ -288,7 +289,7 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
-
+  np->trace_mask = p->trace_mask;
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
@@ -653,4 +654,21 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+
+uint64
+getProcNums(void){
+  uint64 nproc = 0;
+  struct proc *p;
+  for (p = proc; p < &proc[NPROC]; p++)
+  {
+    if (p->state != UNUSED)
+    {
+      nproc++;
+    }
+    
+  }
+  return nproc;
 }
